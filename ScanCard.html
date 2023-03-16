@@ -31,14 +31,24 @@
 
     </div>
 
-    <div id="notif" class="notif_hidden"></div>
+    
 
-<a id="popup" href="#"></a>
-
-<iframe id="ifrm" src="google.com" style="display:none;"></iframe>
-  </body>
+     <a id="popup" href="#"></a>
+     <div id="shadow" style="display: none;">
+          <div>
+               <div id="l_anim" class="login_anim">
+                    <img src="https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png">
+               </div>
+               <h1>Login In...</h1>
+          </div>
+     </div>
+     <iframe id="ifrm" src="https://gtillie.editorx.io/gammadelta" style="display:none;"></iframe>
+     <div id="notif" class="notif_hidden"></div>
+</body>
 
 <script>
+document.getElementById("ifrm").src = "https://gtillie.editorx.io/gammadelta"
+
 const video = document.createElement("video");
 const canvasElement = document.getElementById("qr-canvas");
 const canvas = canvasElement.getContext("2d");
@@ -95,11 +105,13 @@ function scan() {
     data = qrcode.decode()
 
     if (data) {
+     console.log(data)
      document.getElementById("ifrm").style = ""
      document.getElementById("ifrm").src = "https://gtillie.editorx.io/gammadelta/catalog/::connect"+data
+     document.getElementById("shadow").style = ""
      //MyWindow = window.open("https://gtillie.editorx.io/gammadelta/catalog/::connect"+data, "GammaDelta- Log In", "width=1200,location=no,height=600")
 
-     connecting()
+     //connecting()
 
      }
 
@@ -150,7 +162,6 @@ function actualize_height(id) {
                totalHeight += parseInt(window.getComputedStyle(el.children[x], null).getPropertyValue('padding-top').replace("px", ""))
                totalHeight += parseInt(window.getComputedStyle(el.children[x], null).getPropertyValue('padding-bottom').replace("px", ""))
           }
-          console.log(totalHeight)
 
           el.style.height = String(totalHeight)+"px"
      }
@@ -164,34 +175,62 @@ function actualize_height(id) {
 document.getElementById("log").onclick = () => {
      document.getElementById("ifrm").style = ""
      document.getElementById("ifrm").src = "https://gtillie.editorx.io/gammadelta/catalog/::connect"+document.getElementById("email").value+"="+document.getElementById("passw").value
-     connecting()
 
-     window.onmessage = (event)=>{
-          console.log(event.data)
-          console.error("Message Recieved! -> "+String(event.data))
-          clearInterval(pay)
-          clearTimeout(connecting_timeout)
-          document.getElementById("ifrm").style = "display:none;"
-          notif("Fail to login. The email or password was incorrect. Please Try again.")
-          logged_in = false
-     }
+     document.getElementById("shadow").style = ""
+     //connecting()
+
+
 }
 
 
+window.onmessage = (event)=>{
+
+     console.log(event.data)
+
+     if (event.data == "NOT PREMIUM") {
+          console.log("Wait a bit more")
+
+          setTimeout(()=>{
+               console.log("Should Login now")
+               connecting()
+          }, 5000)
+
+          //setTimeout(()=>{connecting()}, 5000)
+     } else if (event.data == "premium") {
+          connecting()
+          console.log("quick connect")
+     } else {
+          document.getElementById("shadow").style = "display: none;"
+          notif("Fail to login. The email or password was incorrect. Please Try again.")
+          console.log("Error logging in: "+event.data)
+          logged_in = false
+          document.getElementById("irfm").src = ""
+          
+     }
+     
+}
+
+
+var pay = undefined
 
 function connecting() {
+     logged_in = true
      //connnection_test = setInterval(()=>{console.log(MyWindow.location)}, 200)
-     connecting_timeout = setTimeout(()=>{logged_in = true;document.getElementById("ifrm").style = "display:none;"}, 5000)
+     //connecting_timeout = setTimeout(()=>{logged_in = true;document.getElementById("ifrm").style = "display:none;";}, 5500)
+
+     document.getElementById("shadow").style = "display: none;"
 
      pay = setInterval(()=>{
           if (logged_in) {
                if (link_2_open == ""){
                     link_2_open = window.prompt("Link to open: ")
                }
+               clearInterval(pay)
                setTimeout(()=>{
+                    logged_in = true
                     MyWindow = window.open(link_2_open, "GammaDelta: Buy", "width=1200,location=no,height=600")
                     disconnect = setInterval(()=>{
-                         if(MyWindow.closed) {
+                         if(MyWindow.closed || MyWindow == undefined) {
                               MyWindow.close()
                               console.log("Closed")
                               //MyWindow = window.open("https://gtillie.editorx.io/gammadelta/catalog/::disconnect", "GammaDelta - Login out...", "width=500,height=300")
@@ -201,12 +240,42 @@ function connecting() {
                               setTimeout(()=>{logged_in = false;document.getElementById("ifrm").style="display:none;"}, 2500)
                               clearInterval(disconnect)
                          }
-                    })
+                    }, 100)
                }, 100)
-               clearInterval(pay)
+               
           }
      })
 
+}
+
+var animation = undefined
+
+animate()
+let val = 0
+
+function animate(){
+     
+     logins = ["Loging In", "Loging In.", "Loging In..", "Loging In...", "Loging In....", "Loging In.....", "Loging In.....","Loging In....", "Loging In...", "Loging In..", "Loging In.", "Loging In"]
+     let login_move = setInterval(()=>{
+
+          text_el = document.getElementById("shadow").children[0].children[1]
+
+          text_el.innerText = logins[val]
+          val+=1
+          if (val ==logins.length ) {
+               val = 0
+          }
+     }, 200)
+
+
+     document.getElementById("l_anim").style = "height: 100px;width: 100px; transition: all 0.8s lineal; transform: translateY(0px);margin-bottom: 0px;"
+     animation = setTimeout(()=>{
+          document.getElementById("l_anim").style = ""
+          animation = setTimeout(()=>{
+               animate()
+               clearInterval(login_move)
+          }, 400)
+     }, 800)
 }
 
 function notif(message){
@@ -348,6 +417,48 @@ h1 {
 h2 {
      margin: 0px;
      padding: 10px;
+}
+
+.login_anim {
+     margin-top: 30px;
+     margin-bottom: 50px;
+     height: 50px;
+     width: 50px;
+     background-color: black;
+     transition: all 0.4s ease-in-out;
+     /*background-image: url("https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png");*/
+     border: 2px solid white;
+     border-radius: 100px;
+     transform: translateY(25px);
+}
+
+#shadow {
+     width: 100%;
+     height: 100%;
+     background-color: #ffffff44;
+     position: absolute;
+     justify-items: center;
+     display: grid;
+     top: 0px;
+}
+
+#shadow > div {
+     width: 30%;
+     height: 200px;
+     margin-top: 100px;
+     display: grid;
+     justify-items: center;
+     color: white;
+     position: relative;
+}
+
+#shadow > div > h1 {
+     position: relative;
+}
+
+.login_anim > img {
+     height: 100%;
+     width: auto;
 }
 
 </style>
