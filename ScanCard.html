@@ -230,7 +230,13 @@ function connecting() {
                     logged_in = true
                     MyWindow = window.open(link_2_open, "GammaDelta: Buy", "width=1200,location=no,height=600")
                     disconnect = setInterval(()=>{
-                         if(MyWindow.closed || MyWindow == undefined) {
+                         if(MyWindow == null) {
+                              clearInterval(disconnect)
+                              document.getElementById("ifrm").src = "https://gtillie.editorx.io/gammadelta/catalog/::disconnect"
+                              window.alert("Windows are disabled. Please allow the to use GammaDelta eazPay")
+                         }
+
+                         if(MyWindow.closed) {
                               MyWindow.close()
                               console.log("Closed")
                               //MyWindow = window.open("https://gtillie.editorx.io/gammadelta/catalog/::disconnect", "GammaDelta - Login out...", "width=500,height=300")
