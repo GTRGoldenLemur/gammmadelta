@@ -86,7 +86,7 @@ document.getElementById("log").onclick = () => {
 	new_div.style.display = "none"
 
 	qr_code = new QRCode("qr", code(mail.value)+"="+code(passw.value)+"="+code(account))
-	postMessage([code(mail.value)+"="+code(passw.value)+"="+code(account), code(pin.value)], "*")
+	window.parent.postMessage([code(mail.value)+"="+code(passw.value)+"="+code(account), code(pin.value)], "*")
 
 }
 
