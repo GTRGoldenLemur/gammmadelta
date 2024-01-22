@@ -32,7 +32,7 @@
                <h1>Login In...</h1>
           </div>
      </div>
-     <iframe id="ifrm" src="https://gtillie.editorx.io/gammadelta" style="display:none;"></iframe>
+     <iframe id="ifrm" src="google.com" style="display:none;"></iframe>
      <div id="notif" class="notif_hidden"></div>
 </body>
 
@@ -53,6 +53,9 @@ if (String(window.location).split("#").length != 1 && String(window.location).sp
 
 
 const ifrm = document.getElementById("ifrm")
+
+ifrm.src = "google.com"
+
 const body = document.getElementById("body")
 
 
@@ -115,9 +118,18 @@ function scan() {
                ifrm.style.display = "block"               
           }, 400)
 
-          console.log("https://gtillie.editorx.io/gammadelta/catalog/::pay"+info[0]+"="+info[1]+"="+info[2]+"="+data)
+          data = String(data).split("=")
+          console.log(data[2])
 
-          ifrm.src = "https://gtillie.editorx.io/gammadelta/catalog/::pay"+info[0]+"="+info[1]+"="+info[2]+"="+data
+
+          if(data.length != 3) {
+
+               // throw new Error("Card do not match requirements")
+          }
+
+          console.log("https://gtillie.editorx.io/gammadelta/catalog/::pay"+info[0]+"="+info[1]+"="+info[2]+"="+data[2])
+
+          ifrm.src = "https://gtillie.editorx.io/gammadelta/catalog/::pay"+info[0]+"="+info[1]+"="+info[2]+"="+data[2]
 
 
 
@@ -126,7 +138,7 @@ function scan() {
 
   } catch (e) {
 
-     console.log(e)
+
 
     if (scanning) {
           setTimeout(scan, 300);
@@ -134,6 +146,13 @@ function scan() {
   }
 }
 
+
+window.onmessage = (e) => {
+     console.log(e.data)
+     if (e.data == "close") {
+          window.close()
+     }
+}
 
 </script>
 <style>
