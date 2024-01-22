@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Votre Carte | Gamma delta</title>
+	<link rel="icon" href="https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+	<style type="text/css">
+		body {
+			background-color: black;
+			display: grid;
+			justify-items: center;
+			color: white;
+			text-align: center;
+			font-family: candara;
+		}
+
+		body > img{
+			width: 10%;
+		}
+		#new {
+			border: 1px solid white;
+			padding: 10px;
+			width: min(30%, 500px);
+			display: grid;
+			grid-template-columns: 1fr;
+			justify-items: center;
+		}
+		input {
+			margin-bottom: 5px;
+			width: 40%;
+		}
+		input:invalid {
+			background-color: palevioletred;
+		}
+	</style>
+
+</head>
+<body>
+
+<img src="https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png">
+<h1>GammaDelta Card</h1>
+<div id="new">
+    Email:
+   <input id="email" type="text" name="">
+   Password:
+   <input id="passw" type="password" name="">
+    Pin:
+   <input id="pin" type="password" placeholder="Create a new 4-digit pin" pattern="[0-9]{4}">
+   <button id="log">Create</button>
+</div>
+
+<div id="qr"></div>
+
+</body>
+
+<script type="text/javascript">
+
+const new_div = document.getElementById("new")
+const mail = document.getElementById("email")
+const passw = document.getElementById("passw")
+const pin = document.getElementById("pin")
+var account = ""
+
+var qr_code = undefined
+
+window.onmessage = (e) => {
+	if (e.data.length == 2 && e.data[1].length > 5) {
+		if (e.data[0] != "new") {
+			console.log(e.data)
+			qr_code = new QRCode("qr", e.data[0])
+			new_div.style.display = "none"
+
+		} else {
+			account = e.data[1]
+		}
+	}
+}
+
+document.getElementById("log").onclick = () => {
+
+	console.log("CREATE QR")
+
+	new_div.style.display = "none"
+
+	qr_code = new QRCode("qr", code(mail.value)+"="+code(passw.value)+"="+code(account))
+	postMessage([code(mail.value)+"="+code(passw.value)+"="+code(account), code(pin.value)], "*")
+
+}
+
+function code(text) {
+
+	var r_l = [["a", "o"], ["1", "2"], ["4", "5"], ["9", "8"], ["3", "6"], ["0", "7"], ["l", "g"], ["L", "%"], ["G", "K"], ["t", "n"], ["j", "v"], ["h", "p"], ["@", "!"], ["r", "s"], ["J", "-"], ["f", "I"], ["k", "P"], ["O", "u"], ["i", "S"], ["e", "F"]]
+	
+	
+	for (var x = 0; x < r_l.length; x++) {
+		text = text.replace(new RegExp(r_l[x][0], "g"), "😂").replace(new RegExp(r_l[x][1], "g"), r_l[x][0]).replace(/😂/g, r_l[x][1])
+	}
+
+	return text	
+}
+
+</script>
+</html>
