@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GammaDelta quickPay</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <link rel="icon" href="https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png">
+    <script src="https://rawgit.com/sitepoint-editors/jsqrcode/master/src/qr_packed.js"></script>
+  </head>
+
+  <body id="body">
+    <div id="container">
+          <img src="https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png">
+          <h1>GammaDelta quickPay</h1>
+
+          <div class="log_in" id="scan">
+               <h2>Delta Card</h2>
+               <button id="btn-scan-qr">Scan QR Code</button>
+               <canvas hidden="" id="qr-canvas"></canvas>
+          </div>
+
+    </div>
+
+    
+
+     <a id="popup" href="#"></a>
+     <div id="shadow" style="display: none;">
+          <div>
+               <div id="l_anim" class="login_anim">
+                    <img src="https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png">
+               </div>
+               <h1>Login In...</h1>
+          </div>
+     </div>
+     <iframe id="ifrm" src="https://gtillie.editorx.io/gammadelta" style="display:none;"></iframe>
+     <div id="notif" class="notif_hidden"></div>
+</body>
+
+<script>
+const video = document.createElement("video");
+const canvasElement = document.getElementById("qr-canvas");
+const canvas = canvasElement.getContext("2d");
+
+//const qrResult = document.getElementById("qr-result");
+const outputData = document.getElementById("outputData");
+const btnScanQR = document.getElementById("btn-scan-qr");
+var info = ""
+
+
+if (String(window.location).split("#").length != 1 && String(window.location).split("#")[1] != "") {
+     info = String(window.location).split("#")[1].split("=")
+}
+
+
+const ifrm = document.getElementById("ifrm")
+const body = document.getElementById("body")
+
+
+let scanning = false;
+
+qrcode.callback = res => {
+  if (res) {
+    scanning = false;
+
+    video.srcObject.getTracks().forEach(track => {
+      track.stop();
+    });
+
+    //qrResult.hidden = false;
+    canvasElement.hidden = true;
+    btnScanQR.hidden = false;
+  }
+};
+
+btnScanQR.onclick = () => {
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: "environment" } })
+    .then(function(stream) {
+      scanning = true;
+      //qrResult.hidden = true;
+      btnScanQR.hidden = true;
+      canvasElement.hidden = false;
+      video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+      video.srcObject = stream;
+      video.play();
+      tick();
+      scan();
+    });
+};
+
+function tick() {
+  canvasElement.height = video.videoHeight;
+  canvasElement.width = video.videoWidth;
+  canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+  scanning && requestAnimationFrame(tick);
+}
+
+
+var scanned = false
+
+function scan() {
+  try {
+
+    data = qrcode.decode() || d
+
+    if (data) {
+
+          console.log("scanned!")
+          console.log(ifrm)
+
+          body.style.backgroundColor = "white"
+          
+          setTimeout(()=>{
+               ifrm.style.display = "block"               
+          }, 400)
+
+          console.log("https://gtillie.editorx.io/gammadelta/catalog/::pay"+info[0]+"="+info[1]+"="+info[2]+"="+data)
+
+          ifrm.src = "https://gtillie.editorx.io/gammadelta/catalog/::pay"+info[0]+"="+info[1]+"="+info[2]+"="+data
+
+
+
+
+     }
+
+  } catch (e) {
+
+     console.log(e)
+
+    if (scanning) {
+          setTimeout(scan, 300);
+     }
+  }
+}
+
+
+</script>
+<style>
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: candara;
+  padding: 0px;
+  height: 100%;
+  background: black;
+  margin: 0;
+  transition: background-color 0.4s ease-in-out;
+}
+
+h1 {
+  color: white;
+  margin: 0;
+  padding: 15px;
+}
+
+#container {
+  text-align: center;
+  margin: 0;
+  justify-items: center;
+  display: grid;
+}
+
+#qr-canvas {
+  margin: auto;
+  width: calc(100% - 20px);
+  max-width: 400px;
+}
+
+#btn-scan-qr {
+  cursor: pointer;
+}
+
+#ifrm {
+     width: 80%;
+     height: 80%;
+     position: absolute;
+     top: 10%;
+     left: 10%;
+     border: 0px;
+     display: none;
+}
+
+.log_in{
+     overflow: hidden;
+     margin-top: 20px;
+     color: white;
+     display: grid;
+     grid-template-columns: 1fr;
+     width: 25%;
+     justify-content: center;
+     justify-items: center;
+     border: 1px solid white;
+     padding-top: 5px;
+     padding: 10px;
+     text-align: center;
+}
+
+#scan{
+     transition: 0.4s all ease-in-out;
+}
+
+img {
+     width: 10%;
+}
+
+
+.log_in > * {
+     text-align: center;
+}
+
+#email_login{
+     transition: 0.4s ease-in-out;
+}
+
+#email_login > input {
+     margin-bottom: 5px;
+}
+
+
+button{
+     border: 1px solid white;
+     background-color: black;
+     color: white;
+     cursor: pointer;
+     transition: all 0.4s ease-in-out;
+     border-radius: 5px;
+     height: 20px;
+     width: 20vw;
+}
+button:hover{
+     border-color: black;
+     background-color: white;
+     color: black;
+
+}
+h1 {
+     padding: 5px;
+     margin: 0px;
+}
+
+#notif{
+     position: absolute;
+     top: 0px;
+     width: calc(100% - 0px);
+     height: 50px;
+     background-color: red;
+     transition: all 0.4s ease-in-out;
+     text-align: center;
+     padding-top: 16px;
+}
+
+.notif_hidden{
+     transform: translateY(-66px);
+}
+
+.notif_showed{
+     transform: translateY(0px);
+}
+
+h2 {
+     margin: 0px;
+     padding: 10px;
+}
+
+.login_anim {
+     margin-top: 30px;
+     margin-bottom: 50px;
+     height: 50px;
+     width: 50px;
+     background-color: black;
+     transition: all 0.4s ease-in-out;
+     /*background-image: url("https://static.wixstatic.com/media/fceca7_1901cddbf2a649c080ba66b2a82e4a07~mv2.png");*/
+     border: 2px solid white;
+     border-radius: 100px;
+     transform: translateY(25px);
+}
+
+#shadow {
+     width: 100%;
+     height: 100%;
+     background-color: #ffffff44;
+     position: absolute;
+     justify-items: center;
+     display: grid;
+     top: 0px;
+}
+
+#shadow > div {
+     width: 30%;
+     height: 200px;
+     margin-top: 100px;
+     display: grid;
+     justify-items: center;
+     color: white;
+     position: relative;
+}
+
+#shadow > div > h1 {
+     position: relative;
+}
+
+.login_anim > img {
+     height: 100%;
+     width: auto;
+}
+
+</style>
+</html>
